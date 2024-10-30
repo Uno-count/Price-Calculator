@@ -1,44 +1,53 @@
 package prices
 
 import (
-	"bufio"
 	"fmt"
-	"os"
+
+	"github.com/Uno-count/Price-Calculator/conversion"
+	"github.com/Uno-count/Price-Calculator/filemanager"
 )
 
-func (job TaxIncludedPriceJob) Process() {
-	result := make(map[string]float64)
+func (job *TaxIncludedPriceJob) Process() {
+
+	job.LoadData()
+
+	result := make(map[string]string)
 
 	for _, price := range job.InputPrices {
-		result[fmt.Sprintf("%.2f", price)] = price * (1 + job.TaxRate)
+		taxIncludedPrice := price * (1 + job.TaxRate)
+		result[fmt.Sprintf("%.2f", price)] = fmt.Sprintf("%.2f", taxIncludedPrice)
 	}
+
+	job.TaxIncludedPrices = result
+
+	conversion.WriteJSON(fmt.Sprintf("result_%.0f.json", job.TaxRate), job)
 
 	fmt.Println(result)
 }
 
-func (job TaxIncludedPriceJob) LoadData() {
-	file, err := os.Open("data.txt")
+func (job *TaxIncludedPriceJob) LoadData() {
+
+	lines, err := filemanager.ReadLines("prices/data.txt")
 
 	if err != nil {
-		fmt.Println("An error occured")
 		fmt.Println(err)
 
 		return
 	}
 
-	scanner := bufio.NewScanner(file)
+	prices, err := conversion.StringsToFloat(lines)
 
-	var lines []string
-
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
-	err = scanner.Err()
-	if err != nil {
-		fmt.Println("Could not open file!")
-		fmt.Println(err)
-		file.Close()
-		return
+	job.InputPrices = prices
+}
+
+func NewTaxIncludedPriceJob(taxRate float64) *TaxIncludedPriceJob {
+	return &TaxIncludedPriceJob{
+		InputPrices: []float64{10, 20, 30},
+		TaxRate:     taxRate,
 	}
 }
