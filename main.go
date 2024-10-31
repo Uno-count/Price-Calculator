@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/Uno-count/Price-Calculator/cmd"
 	"github.com/Uno-count/Price-Calculator/prices"
 )
@@ -11,10 +13,15 @@ func main() {
 
 	for _, taxRate := range taxRates {
 		// fm := filemanager.New("prices/data.txt", fmt.Sprintf("result_%.0f.json", taxRate*100))
-
 		cmdm := cmd.New()
+
 		priceJob := prices.NewTaxIncludedPriceJob(cmdm, taxRate)
-		priceJob.Process()
+		err := priceJob.Process()
+
+		if err != nil {
+			fmt.Println("cannot process the job")
+			fmt.Println(err)
+		}
 	}
 
 }

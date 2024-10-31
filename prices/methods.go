@@ -7,9 +7,13 @@ import (
 	"github.com/Uno-count/Price-Calculator/iomanager"
 )
 
-func (job *TaxIncludedPriceJob) Process() {
+func (job *TaxIncludedPriceJob) Process() error {
 
-	job.LoadData()
+	err := job.LoadData()
+
+	if err != nil {
+		return err
+	}
 
 	result := make(map[string]string)
 
@@ -19,30 +23,30 @@ func (job *TaxIncludedPriceJob) Process() {
 	}
 
 	job.TaxIncludedPrices = result
+	return job.IOManager.WriteResult(job)
 
-	job.IOManager.WriteResult(job)
-
-	fmt.Println(result)
 }
 
-func (job *TaxIncludedPriceJob) LoadData() {
+func (job *TaxIncludedPriceJob) LoadData() error {
 
 	lines, err := job.IOManager.ReadLines()
 
 	if err != nil {
 		fmt.Println(err)
 
-		return
+		return err
 	}
 
 	prices, err := conversion.StringsToFloat(lines)
 
 	if err != nil {
 		fmt.Println(err)
-		return
+		return err
 	}
 
 	job.InputPrices = prices
+
+	return nil
 }
 
 func NewTaxIncludedPriceJob(iom iomanager.IOManager, taxRate float64) *TaxIncludedPriceJob {
