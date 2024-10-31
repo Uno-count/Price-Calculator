@@ -7,9 +7,14 @@ import (
 	"github.com/Uno-count/Price-Calculator/iomanager"
 )
 
-func (job *TaxIncludedPriceJob) Process(doneChan chan bool) {
+func (job *TaxIncludedPriceJob) Process(doneChan chan bool, chanError chan error) {
 
-	job.LoadData()
+	err := job.LoadData()
+
+	if err != nil {
+		chanError <- err
+		return
+	}
 
 	result := make(map[string]string)
 
