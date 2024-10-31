@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"time"
 )
 
 func (fm FileManager) ReadLines() ([]string, error) {
@@ -39,6 +40,8 @@ func (fm FileManager) WriteResult(data any) error {
 	if err != nil {
 		return errors.New("failed to create file")
 	}
+
+	time.Sleep(3 * time.Second) //make up scenario for goroutine
 
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(data)

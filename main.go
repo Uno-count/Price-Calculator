@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/Uno-count/Price-Calculator/cmd"
+	"github.com/Uno-count/Price-Calculator/filemanager"
 	"github.com/Uno-count/Price-Calculator/prices"
 )
 
@@ -11,17 +11,24 @@ func main() {
 
 	taxRates := []float64{0, 0.7, 0.1, 0, 0.15}
 
-	for _, taxRate := range taxRates {
-		// fm := filemanager.New("prices/data.txt", fmt.Sprintf("result_%.0f.json", taxRate*100))
-		cmdm := cmd.New()
+	doneChans := make([]chan bool, len(taxRates))
 
-		priceJob := prices.NewTaxIncludedPriceJob(cmdm, taxRate)
-		err := priceJob.Process()
+	for i, taxRate := range taxRates {
+		doneChans[i] = make(chan bool)
+		fm := filemanager.New("prices/data.txt", fmt.Sprintf("result_%.0f.json", taxRate*100))
+		// cmdm := cmd.New()
 
-		if err != nil {
-			fmt.Println("cannot process the job")
-			fmt.Println(err)
-		}
+		priceJob := prices.NewTaxIncludedPriceJob(fm, taxRate)
+		go priceJob.Process(doneChans[i])
+
+		// if err != nil {
+		// 	fmt.Println("cannot process the job")
+		// 	fmt.Println(err)
+		// }
+	}
+
+	for _, doneChan := range doneChans {
+		<-doneChan
 	}
 
 }
