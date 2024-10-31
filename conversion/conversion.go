@@ -1,9 +1,7 @@
 package conversion
 
 import (
-	"encoding/json"
 	"errors"
-	"os"
 	"strconv"
 )
 
@@ -22,23 +20,4 @@ func StringsToFloat(strings []string) ([]float64, error) {
 	}
 
 	return floats, nil
-}
-
-func WriteJSON(path string, data any) error {
-	file, err := os.Create(path)
-
-	if err != nil {
-		return errors.New("failed to create file")
-	}
-
-	encoder := json.NewEncoder(file)
-	err = encoder.Encode(data)
-
-	if err != nil {
-		return errors.New("failed to convert data to json")
-	}
-
-	file.Close()
-
-	return nil
 }
