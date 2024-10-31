@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Uno-count/Price-Calculator/conversion"
-	"github.com/Uno-count/Price-Calculator/filemanager"
+	"github.com/Uno-count/Price-Calculator/iomanager"
 )
 
 func (job *TaxIncludedPriceJob) Process() {
@@ -45,9 +45,9 @@ func (job *TaxIncludedPriceJob) LoadData() {
 	job.InputPrices = prices
 }
 
-func NewTaxIncludedPriceJob(fm filemanager.FileManager, taxRate float64) *TaxIncludedPriceJob {
+func NewTaxIncludedPriceJob(iom iomanager.IOManager, taxRate float64) *TaxIncludedPriceJob {
 	return &TaxIncludedPriceJob{
-		IOManager:   fm,
+		IOManager:   iom,
 		InputPrices: []float64{10, 20, 30},
 		TaxRate:     taxRate,
 	}
